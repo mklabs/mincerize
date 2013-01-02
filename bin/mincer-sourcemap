@@ -1,0 +1,66 @@
+#!/usr/bin/env node
+
+// XXX noptify
+var fs     = require('fs');
+var path   = require('path');
+var nopt   = require('nopt');
+var minmap = require('..');
+
+var opts = nopt({
+  help: Boolean,
+  output: String,
+  'source-map': String,
+  'source-map-root': String,
+  'in-source-map': String
+});
+
+var files = opts.argv.remain;
+var output = opts.output ? fs.createWriteStream(opts.output) : process.stdout;
+
+var input = '';
+
+// have positional arguments, consider as the array of input files
+// otherwise, if no args, take input from stdin
+var collect = files.length ? readFiles.bind(null, files.slice(0)) : stdin;
+
+collect(function(err, result) {
+  if(err) throw err;
+  console.error('... Generating minified output and sourcemap ...');
+
+  if(!opts['source-map']) {
+    if(files.length === 1) {
+      opts['source-map'] = files[0] + '.map';
+      console.error('... No sourcemap option defined, but only a single entry file. Defaults sourcemap to %s ...', opts['source-map']);
+    } else {
+      opts['source-map'] = 'mincer.map';
+      console.error('... No sourcemap option defined, and unable to determine from input. Will default sourcemap to %s ...', opts['source-map']);
+    }
+  }
+
+  minmap(result, opts).pipe(output);
+});
+
+// Utilities
+
+function stdin(done) {
+  var data = '';
+  process.stdin.setEncoding('utf8');
+  process.stdin.on('error', done);
+  process.stdin.on('data', function(chunk){
+    data += chunk;
+  }).on('end', function(){
+    done(null, data);
+  }).resume();
+}
+
+function readFiles(files, done) {
+  var data = '';
+  (function read(file) {
+    if(!file) return done(null, data);
+    fs.readFile(file, 'utf8', function(err, body) {
+      if(err) return done(err);
+      data += body;
+      read(files.shift());
+    });
+  })(files.shift());
+}

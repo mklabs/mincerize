@@ -8,10 +8,27 @@ var minmap = require('..');
 
 var opts = nopt({
   help: Boolean,
+
+  // the output stream, if defined write to this file
   output: String,
+
+  // the source-map option, if not defined, mincer-sourcemap will try to
+  // determine one from input or defaults to `mincer.map` for stinds
   'source-map': String,
+
+  // The source map root option. Not required, allows you to prepend the
+  // sources with a folder structure – this is also how you hook scripts
+  // within a CDN (can accept full URLs)
   'source-map-root': String,
-  'in-source-map': String
+
+  // The in sourcemap option, in case you are generating sourcemap from
+  // other sourcemapped input
+  'in-source-map': String,
+
+  // Specifics. When defined, goes through each sourcemap filepath, and
+  // remove the value you defined here, should be relative to
+  // `source-map-root`
+  'source-map-prefix': String
 });
 
 var files = opts.argv.remain;

@@ -5,6 +5,7 @@
   "main": "lib/mincer-sourcemap",
   "bin": "bin/mincer-sourcemap",
   "dependencies": {
-    "nopt": "~2.0.0"
+    "nopt": "~2.0.0",
+    "uglify-js2": "~2.1.11"
   }
 }

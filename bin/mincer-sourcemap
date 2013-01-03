@@ -13,7 +13,7 @@ var opts = nopt({
   output: String,
 
   // the source-map option, if not defined, mincer-sourcemap will try to
-  // determine one from input or defaults to `mincer.map` for stinds
+  // determine one from input or defaults to `mincer.map` for stdin
   'source-map': String,
 
   // The source map root option. Not required, allows you to prepend the
@@ -25,14 +25,22 @@ var opts = nopt({
   // other sourcemapped input
   'in-source-map': String,
 
-  // Specifics. When defined, goes through each sourcemap filepath, and
-  // remove the value you defined here, should be relative to
+  // When defined, goes through each sourcemap filepath, and
+  // remove the value you define here, should be relative to
   // `source-map-root`
   'source-map-prefix': String,
 
   // Specifics. Allows you to prevent the minification process, only
   // generates the sourcemap file.
   nocompress: Boolean
+}, {
+  sourcemap: '--source-map',
+  prefix: '--source-map-prefix',
+  root: '--source-map-root',
+  'sourcemap-root': '--source-map-root',
+  nominify: '--nocompress',
+  'no-minify': '--nocompress',
+  'no-compress': '--nocompress'
 });
 
 var files = opts.argv.remain;

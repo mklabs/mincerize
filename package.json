@@ -8,6 +8,7 @@
     "nopt": "~2.0.0",
     "esmangle": "0.0.9-1",
     "esprima": "~1.0.2",
-    "escodegen": "0.0.15"
+    "escodegen": "0.0.15",
+    "uglify-js2": "~2.1.11"
   }
 }

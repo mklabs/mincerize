@@ -28,7 +28,11 @@ var opts = nopt({
   // Specifics. When defined, goes through each sourcemap filepath, and
   // remove the value you defined here, should be relative to
   // `source-map-root`
-  'source-map-prefix': String
+  'source-map-prefix': String,
+
+  // Specifics. Allows you to prevent the minification process, only
+  // generates the sourcemap file.
+  nocompress: Boolean
 });
 
 var files = opts.argv.remain;

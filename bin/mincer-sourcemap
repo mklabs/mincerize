@@ -60,9 +60,6 @@ collect(function(err, result) {
     if(files.length === 1) {
       opts['source-map'] = files[0] + '.map';
       console.error('... No sourcemap option defined, but only a single entry file. Defaults sourcemap to %s ...', opts['source-map']);
-    } else {
-      opts['source-map'] = 'mincer.map';
-      console.error('... No sourcemap option defined, and unable to determine from input. Will default sourcemap to %s ...', opts['source-map']);
     }
   }
 

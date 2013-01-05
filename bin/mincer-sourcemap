@@ -12,6 +12,10 @@ var opts = nopt({
   // the output stream, if defined write to this file
   output: String,
 
+  // JS
+
+  js: Boolean,
+
   // the source-map option, if not defined, mincer-sourcemap will try to
   // determine one from input or defaults to `mincer.map` for stdin
   'source-map': String,
@@ -32,15 +36,27 @@ var opts = nopt({
 
   // Specifics. Allows you to prevent the minification process, only
   // generates the sourcemap file.
-  nocompress: Boolean
+  nocompress: Boolean,
+
+  // CSS
+
+  css: Boolean,
+
+  'css-debug-host': String,
+
+  'css-debug-prefix': String
 }, {
-  sourcemap: '--source-map',
-  prefix: '--source-map-prefix',
-  root: '--source-map-root',
-  'sourcemap-root': '--source-map-root',
-  nominify: '--nocompress',
-  'no-minify': '--nocompress',
-  'no-compress': '--nocompress'
+  sourcemap        : '--source-map',
+  prefix           : '--source-map-prefix',
+  root             : '--source-map-root',
+  'sourcemap-root' : '--source-map-root',
+  nominify         : '--nocompress',
+  'no-minify'      : '--nocompress',
+  'no-compress'    : '--nocompress',
+
+  'css-host'       : '--css-debug-host',
+  'host'           : '--css-debug-host',
+  'css-prefix'     : '--css-debug-prefix'
 });
 
 var files = opts.argv.remain;
@@ -54,8 +70,6 @@ var collect = files.length ? readFiles.bind(null, files.slice(0)) : stdin;
 
 collect(function(err, result) {
   if(err) throw err;
-  console.error('... Generating minified output and sourcemap ...');
-
   if(!opts['source-map']) {
     if(files.length === 1) {
       opts['source-map'] = files[0] + '.map';

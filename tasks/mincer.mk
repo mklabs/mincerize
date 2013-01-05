@@ -1,6 +1,8 @@
 
-# Generic targets to build minified & non minified script + sourcemap
-# from sprocketized or not sprocketized input
+# Generic targets to build:
+#
+# - minified & non minified script + sourcemap from sprocketized (or not sprocketized) input
+# - concat and generate `-sass-debug-info` from sprocketized (or not sprocketized) input
 #
 # This works with approximately everything, with the result of mincer or
 # standard script as input, with an optional initial sourceMappingURL
@@ -23,6 +25,16 @@
 %.bundle.js: %.js
 	@echo ... Computing dependencies from $< through mincer ...
 	@echo ... Compiling script to $@ ...
+	@echo
+	mincer-compile $^ | mincer-sourcemap \
+		--nocompress \
+		--source-map $(patsubst %.js,%.map,$<) \
+		--source-map-prefix "$(dir $@)" \
+		> $@
+
+%.bundle.css: %.css
+	@echo ... Computing dependencies from $< through mincer ...
+	@echo ... Compiling CSS to $@ ...
 	@echo
 	mincer-compile $^ | mincer-sourcemap \
 		--nocompress \

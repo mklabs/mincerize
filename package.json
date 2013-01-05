@@ -10,6 +10,8 @@
     "esprima": "~1.0.2",
     "escodegen": "0.0.15",
     "uglify-js2": "~2.1.11",
-    "stylus": "~0.32.0"
+    "stylus": "~0.32.0",
+    "css-parse": "~1.0.4",
+    "rework": "~0.10.2"
   }
 }

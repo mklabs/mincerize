@@ -20,6 +20,8 @@
 #
 # 		PATH := ./node_modules/.bin:$(PATH)
 
+# JS
+
 %.map: %.js
 	@echo ... Buidling JS map: $@ ...
 	@echo ... Computing dependencies from $< through mincer ...
@@ -40,16 +42,6 @@
 		--source-map-prefix "$(dir $@)" \
 		> $@
 
-%.bundle.css: %.css
-	@echo ... Computing dependencies from $< through mincer ...
-	@echo ... Compiling CSS to $@ ...
-	@echo
-	mincer-compile $^ | mincer-sourcemap \
-		--nocompress \
-		--source-map $(patsubst %.js,%.map,$<) \
-		--source-map-prefix "$(dir $@)" \
-		> $@
-
 %.min.js: %.js
 	@echo ... Buidling JS map from $< ...
 	@echo ... Compiling minified script to $@ ...
@@ -58,3 +50,15 @@
 		--source-map $(patsubst %.js,%.map,$<) \
 		--source-map-prefix "$(dir $@)" \
 		> $@
+
+# CSS
+
+%.bundle.css: %.css
+	@echo ... Computing dependencies from $< through mincer ...
+	@echo ... Compiling CSS to $@ ...
+	@echo
+	mincer $^ | mincer-sourcemap --css --css-host http://192.168.0.11:3000 > $@
+
+%.min.css: %.css
+	@echo ... Compiling minified stylesheet $< to $@ ...
+	csso $< > $@

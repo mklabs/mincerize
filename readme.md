@@ -1,7 +1,15 @@
+mincer-sourcemap
+================
+
+*assets sourcemapping (post)processor*
 
 This is a thing that take a mincer / sprockets output stream of JS or CSS as
 input, and outputs the minified (or not minified bundle) with according
 sourcemap or `-sass-debug-info`.
+
+While it falls back to reasonable behavior when not used with
+[mincer](git://github.com/nodeca/mincer.git), it is primary built for the
+purpose of parsing mincer stream, and works best in that scenario.
 
 ## Example
 
@@ -14,6 +22,9 @@ $ mincer-sourcemap assets/base.js
 //@ sourceMappingURL=assets/base.js.map
 
 $ cat assets/base.js.map
+```
+
+```json
 {
   "version": 3,
   "file": "assets/base.js.map",

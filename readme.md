@@ -13,8 +13,8 @@ purpose of parsing mincer stream, and works best in that scenario.
 
 ## Example
 
-Sourcemap is always generated relative to the input file. Debug statemens are
-always displated on STDERR, while STDOUT ouputs the final JS or CSS result
+Sourcemap is always generated relative to the input file. Debug statements are
+always displayed on STDERR, while STDOUT ouputs the final JS or CSS result
 (`--output` can also be used to redirect the output to a given file)
 
 ```
@@ -145,11 +145,11 @@ Specify the `in-source-map` option.
 $ mincer-sourcemap public/javascript/app.js --in-source-map public/javascript/app.map
 ```
 
-Unless `--in-source-map` is explicitely set, the end of the input file
+Unless `--in-source-map` is explicitly set, the end of the input file
 is parsed looking for an existing `sourceMappingURL` to use as
 sourcemap input. This is ofen useful if you wish to chain targets and
-invokation, or maybe generate proper sourcemapping for CoffeeScript generated
-with [CoffeeScriptRedux](http://michaelficarra.github.com/CoffeeScriptRedux/)
+streams, or maybe generate proper sourcemapping for CoffeeScript output
+generated with [CoffeeScriptRedux](http://michaelficarra.github.com/CoffeeScriptRedux/)
 
 ```
 $ mincer-sourcemap assets/base.js --dev | mincer-sourcemap --sourcemap assets/base.min.js.map

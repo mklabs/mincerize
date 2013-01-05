@@ -7,19 +7,18 @@
     "bin": "bin"
   },
   "dependencies": {
-    "nopt": "~2.0.0",
     "esmangle": "0.0.9-1",
     "esprima": "~1.0.2",
     "escodegen": "0.0.15",
     "uglify-js2": "~2.1.11",
     "stylus": "~0.32.0",
     "css-parse": "~1.0.4",
-    "rework": "~0.10.2"
+    "rework": "~0.10.2",
+    "noptify": "0.0.1"
   },
   "devDependencies": {
     "mincer": "~0.4.3"
   },
-
   "scripts": {
     "test": "mincer -I ./ examples/todo-backbone/assets/js/manifest.js"
   }

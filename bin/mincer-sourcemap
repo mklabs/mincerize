@@ -3,63 +3,75 @@
 // XXX noptify
 var fs     = require('fs');
 var path   = require('path');
-var nopt   = require('nopt');
+var noptify = require('noptify')
 var minmap = require('..');
 
-var opts = nopt({
-  help: Boolean,
+var opts = noptify(process.argv, { program: 'mincer-sourcemap' })
+  .version(require('../package.json').version)
+  .option('output', 'The output stream (default: process.stdout)')
 
-  // the output stream, if defined write to this file
-  output: String,
-
-  // JS
-
-  js: Boolean,
-
-  // the source-map option, if not defined, mincer-sourcemap will try to
+  // The source-map option, if not defined, mincer-sourcemap will try to
   // determine one from input or defaults to `mincer.map` for stdin
-  'source-map': String,
+  .option('source-map', 'The generated sourcemap location')
 
   // The source map root option. Not required, allows you to prepend the
   // sources with a folder structure – this is also how you hook scripts
-  // within a CDN (can accept full URLs)
-  'source-map-root': String,
-
-  // The in sourcemap option, in case you are generating sourcemap from
-  // other sourcemapped input
-  'in-source-map': String,
+  // within a CDN
+  .option('source-map-root', 'Sourcemap root option')
 
   // When defined, goes through each sourcemap filepath, and
   // remove the value you define here, should be relative to
   // `source-map-root`
-  'source-map-prefix': String,
+  .option('source-map-prefix', 'Rewrites sources Array in genrated sourcemap to remove this prefix value')
 
-  // Specifics. Allows you to prevent the minification process, only
-  // generates the sourcemap file.
-  nocompress: Boolean,
+  // The in sourcemap option, in case you are generating sourcemap from
+  // other sourcemapped input
+  .option('in-source-map', 'Explicitely specificy the input sourcemap, otherwise guess from input', String)
 
-  // CSS
+  // Allows you to prevent the minification process, only generates the sourcemap file.
+  .option('nocompress', 'Outputs JS in beautified mode instead of the standard minification', Boolean)
 
-  css: Boolean,
+  // css-debug related options
 
-  'css-debug-host': String,
+  // Debug host, when defined generates filename mapping based on HTTP protocol
+  // instead of the usual `file://` + absolute filepath.
+  .option('css-debug-host', 'Generates `-sass-debug-info` with filename based on this HTTP host (instead of absolute filepath)')
 
-  'css-debug-prefix': String
-}, {
-  sourcemap        : '--source-map',
-  prefix           : '--source-map-prefix',
-  root             : '--source-map-root',
-  'sourcemap-root' : '--source-map-root',
-  nominify         : '--nocompress',
-  'no-minify'      : '--nocompress',
-  'no-compress'    : '--nocompress',
+  .option('css-debug-prefix', 'Only relevant with css-debug-host and acts like source-map-prefix')
 
-  'css-host'       : '--css-debug-host',
-  'host'           : '--css-debug-host',
-  'css-prefix'     : '--css-debug-prefix',
+  .option('css', 'Turn the compilation mode into `.css`. Useful for stdin input. JS is the default mode.')
 
-  'dev'            : '--nocompress'
-});
+  .shorthands({
+    sourcemap        : '--source-map',
+    prefix           : '--source-map-prefix',
+    root             : '--source-map-root',
+    'sourcemap-root' : '--source-map-root',
+    nominify         : '--nocompress',
+    'no-minify'      : '--nocompress',
+    'no-compress'    : '--nocompress',
+
+    'css-host'       : '--css-debug-host',
+    'host'           : '--css-debug-host',
+    'css-prefix'     : '--css-debug-prefix',
+
+    'dev'            : '--nocompress'
+  })
+
+  .on('help', function() {
+    console.log();
+    console.log('  Examples:');
+    console.log();
+    console.log('    # js');
+    console.log('    $ mincer assets/javascript/manifest.js | mincer-sourcemap');
+    console.log('    $ mincer-sourcemap assets/javascript/app.bundle.js');
+    console.log();
+    console.log('    # css');
+    console.log('    $ cat public/stylesheets/app.bundle.css | mincer-sourcemap --css');
+    console.log('    $ mincer-sourcemap public/stylesheets/app.bundle.css --css-debug-host http://localhost:3000');
+    console.log();
+  })
+
+  .parse();
 
 var files = opts.argv.remain;
 var output = opts.output ? fs.createWriteStream(opts.output) : process.stdout;

@@ -1,2 +1,125 @@
 #!/usr/bin/env node
 
+var fs      = require('fs');
+var noptify = require('noptify')
+var minmap  = require('..');
+
+var program = noptify(process.argv);
+var opts = program.parse();
+var files = opts.argv.remain;
+
+// Stream EVERYTHING
+
+// We should be able to do crazy stuff like this
+
+//    # parse out the JS / CSS assets, output the listing
+//    $ cat index.html | mincer-html
+//
+//    # mincer-compile is a simple wrapper on top of mincer, to be able to read
+//    # from stdin mainly.
+//
+//    # read the input file listing, pass them all to mincer output the concatanated result
+//    # CSS / JS can be mixed, but another stream may read from this path and write back each one to file system.
+//    $ cat index.html | mincer-html | mincer-compile
+//
+//    # concat / minification / sourcemap compilation step
+//    # In case of mixed CSS / JS input, outputs the compiled output with comment
+//    # filepath info (eg. `/*** path/to/file.css ***/`) between each file.
+//    #
+//    # This may generate a bunch of *.map files, next to the original file
+//    $ cat index.html | mincer-html | mincer-compile | mincer-sourcemap
+//
+//    # revving step, simply updates the filepath to the versioned one,
+//    # based on content hash.
+//    $ cat index.html | mincer-html | mincer-compile | mincer-sourcemap | mincer-rev
+//
+//    # write back to the filesytem step
+//    # this splits out a chunk compiled JS / CSS and writes each part back to
+//    # the filesystem, based on the comment filepath value.
+//    #
+//    # The output is the same as the input.
+//    $ cat index.html | ... | mincer-rev | mincer-write
+//
+//    # update references in `index.html` each filepath that appear in the input stream
+//    $ cat index.html | ... | mincer-write | mincer-html index.html
+
+// Or simply, which include everything
+
+// $ cat index.html | mincer-build
+//
+// # parse out index.html
+// # get back the list of assets to precompile
+// # for each asset, compile through mincer (include dir relative to index.html)
+// # compile sourcemapping for each asset
+// # compute file sha1 for each file.
+// # replace the original filename to the final one
+//
+
+var collect = files.length ? readFiles.bind(null, files) : program.stdin.bind(program);
+collect(run);
+
+function readFiles(files, done) {
+  var data = '';
+  (function read(file) {
+    if(!file) return done(null, data);
+    fs.readFile(file, 'utf8', function(err, body) {
+      if(err) return done(err);
+      data += body;
+      read(files.shift());
+    });
+  })(files.shift());
+}
+
+
+var util = require('util');
+var Stream = require('stream').Stream;
+
+// Parses a chunk of HTML and returns the lisf of JS and CSS assets in the
+// order they appear in the input chunk of HTML.
+function MincerHtml(html, options) {
+  options = options || {};
+  this.body = html;
+  this.tree = {};
+  this.assets = [];
+  this.css = [];
+  this.js = [];
+
+  this.matchCss = options.matchCss || /\s*<link.+href=['"](.+)['"]/;
+  this.matchJs = options.matchJs || /\s*<script.+src=['"](.+)['"]/;
+
+  this.parse();
+  process.nextTick(this.output.bind(this));
+}
+
+util.inherits(MincerHtml, Stream);
+
+MincerHtml.prototype.parse = function parse(data) {
+  data = data || this.body;
+  var lines = data.split('\n');
+
+  var assets = lines.filter(function(l) {
+    var js = this.matchJs.test(l);
+    var css = this.matchCss.test(l);
+    return js || css;
+  }, this).map(function(line) {
+    var filepath = (line.match(this.matchCss) || [])[1];
+    if(!filepath) filepath = (line.match(this.matchJs) || [])[1];
+    return filepath || '';
+  }, this);
+
+  this.assets = this.assets.concat(assets);
+
+  return this;
+};
+
+MincerHtml.prototype.output = function output() {
+  this.assets.forEach(function(filename) {
+    this.emit('data', filename + '\n');
+  }, this);
+};
+
+function run(err, result) {
+  console.log('run baby run');
+  var html = new MincerHtml(result);
+  html.pipe(process.stdout)
+}

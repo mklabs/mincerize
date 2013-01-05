@@ -1,0 +1,41 @@
+### idea
+
+Stream EVERYTHING
+We should be able to do crazy stuff like this
+
+    # parse out the JS / CSS assets, output the listing
+    $ cat index.html | mincer-html
+
+    # mincer-compile is a simple wrapper on top of mincer, to be able to read
+    # from stdin mainly.
+
+    # read the input file listing, pass them all to mincer output the concatanated result
+    # CSS / JS can be mixed, but another stream may read from this path and write back each one to file system.
+    $ cat index.html | mincer-html | mincer-compile
+
+    # concat / minification / sourcemap compilation step
+    # In case of mixed CSS / JS input, outputs the compiled output with comment
+    # filepath info (eg. `/*** path/to/file.css ***/`) between each file.
+    #
+    # This may generate a bunch of *.map files, next to the original file
+    $ cat index.html | mincer-html | mincer-compile | mincer-sourcemap
+
+    # revving step, simply updates the filepath to the versioned one,
+    # based on content hash.
+    $ cat index.html | mincer-html | mincer-compile | mincer-sourcemap | mincer-rev
+
+    # write back to the filesytem step
+    # this splits out a chunk compiled JS / CSS and writes each part back to
+    # the filesystem, based on the comment filepath value.
+    #
+    # The output is the same as the input.
+    $ cat index.html | ... | mincer-rev | mincer-write
+
+    # update references in `index.html` each filepath that appear in the input stream
+    $ cat index.html | ... | mincer-write | mincer-html index.html
+
+### MincerHtml
+
+Parses a chunk of HTML and returns the lisf of JS and CSS assets in the
+order they appear in the input chunk of HTML.
+

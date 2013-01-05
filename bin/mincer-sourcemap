@@ -56,7 +56,9 @@ var opts = nopt({
 
   'css-host'       : '--css-debug-host',
   'host'           : '--css-debug-host',
-  'css-prefix'     : '--css-debug-prefix'
+  'css-prefix'     : '--css-debug-prefix',
+
+  'dev'            : '--nocompress'
 });
 
 var files = opts.argv.remain;

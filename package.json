@@ -1,9 +1,11 @@
 {
   "name": "mincer-sourcemap",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "Takes a mincer compiled script as input stream, outputs the minified bundle with sourcemap",
   "main": "lib/mincer-sourcemap",
-  "bin": "bin/mincer-sourcemap",
+  "directories": {
+    "bin": "bin"
+  },
   "dependencies": {
     "nopt": "~2.0.0",
     "esmangle": "0.0.9-1",
@@ -13,5 +15,12 @@
     "stylus": "~0.32.0",
     "css-parse": "~1.0.4",
     "rework": "~0.10.2"
+  },
+  "devDependencies": {
+    "mincer": "~0.4.3"
+  },
+
+  "scripts": {
+    "test": "mincer -I ./ examples/todo-backbone/assets/js/manifest.js"
   }
 }

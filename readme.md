@@ -3,6 +3,55 @@ This is a thing that take a mincer / sprockets output stream of JS or CSS as
 input, and outputs the minified (or not minified bundle) with according
 sourcemap or `-sass-debug-info`.
 
+## Example
+
+```
+$ cd examples/todo-backbone
+$ mincer-sourcemap assets/base.js
+... No sourcemap option defined, but only a single entry file. Defaults sourcemap to assets/base.js.map ...
+... Generate sourcemap to assets/base.js.map ...
+(function(){"use strict";"todomvc.com"===location.hostname&&function(e,t){var o=e.createElement(t),n=e.getElementsByTagName(t)[0];o.src="//www.google-analytics.com/ga.js",n.parentNode.insertBefore(o,n)}(document,"script")})(window);
+//@ sourceMappingURL=assets/base.js.map
+
+$ cat assets/base.js.map
+{
+  "version": 3,
+  "file": "assets/base.js.map",
+  "sources": [
+    "assets/base.js.js"
+  ],
+  "names": [
+    "location",
+    "hostname",
+    "d",
+    "t",
+    "g",
+    "createElement",
+    "s",
+    "getElementsByTagName",
+    "src",
+    "parentNode",
+    "insertBefore",
+    "document",
+    "window"
+  ],
+  "mappings": "CAAA,WACC,YAE2B,iBAAtBA,SAASC,UACkD,SAASC,EAAEC,GAAG,GAAIC,GAAEF,EAAEG,cAAcF,GAAGG,EAAEJ,EAAEK,qBAAqBJ,GAAG,EAAGC,GAAEI,IAAI,mCAAmCF,EAAEG,WAAWC,aAAaN,EAAEE,IAAIK,SAAS,YAErNC"
+}
+
+# install mincer separately
+$ mincer assets/manifest.js -I ./ | mincer-sourcemap
+... No sourcemap option defined. Will default sourcemap to assets/manifest.map ...
+... Generate sourcemap from the following files ...
+... assets/base.js ...
+... assets/js/app.js ...
+... assets/manifest.js ...
+... Generate sourcemap to assets/manifest.map ...
+(function(){"use strict";"todomvc.com"===location.hostname&&function(e,t){var n=e.createElement(t),o=e.getElementsByTagName(t)[0];n.src="//www.google-analytics.com/ga.js",o.parentNode.insertBefore(n,o)}(document,"script")})(window);var app=app||{},ENTER_KEY=13;$(function(){new app.AppView});
+//@ sourceMappingURL=assets/manifest.map
+```
+
+## Description
+
 The input chunk is parsed for `/*** filepath ***/` pattern to determine the
 ordered list of assets, and pass it through the relevant compiler.
 

@@ -13,6 +13,10 @@ purpose of parsing mincer stream, and works best in that scenario.
 
 ## Example
 
+Sourcemap is always generated relative to the input file. Debug statemens are
+always displated on STDERR, while STDOUT ouputs the final JS or CSS result
+(`--output` can also be used to redirect the output to a given file)
+
 ```
 $ cd examples/todo-backbone
 $ mincer-sourcemap assets/base.js
@@ -48,7 +52,9 @@ $ cat assets/base.js.map
   ],
   "mappings": "CAAA,WACC,YAE2B,iBAAtBA,SAASC,UACkD,SAASC,EAAEC,GAAG,GAAIC,GAAEF,EAAEG,cAAcF,GAAGG,EAAEJ,EAAEK,qBAAqBJ,GAAG,EAAGC,GAAEI,IAAI,mCAAmCF,EAAEG,WAAWC,aAAaN,EAAEE,IAAIK,SAAS,YAErNC"
 }
+```
 
+```
 # install mincer separately
 $ mincer assets/manifest.js -I ./ | mincer-sourcemap
 ... No sourcemap option defined. Will default sourcemap to assets/manifest.map ...
@@ -80,6 +86,8 @@ be based on HTTP protocol, instead of the usual `file://absolute/path/name`.
 
 ## Usage
 
+### JS
+
 Compile sprocketized bundle through mincer first, then generate the
 minified file with sourcemap
 
@@ -95,14 +103,15 @@ Operate over stdio
 $ mincer assets/javascript/app.js | mincer-sourcemap
 ```
 
-Not minify the content
+Not minify the content. This is particularly useful in dev environment, significantly faster.
 
 ```
 $ mincer-sourcemap file.js --nocompress
+$ mincer-sourcemap file.js --dev
 ```
 
-Generate with explicit sourcemap's filename (otherwise, it is guessed
-from input)
+Generate with explicit sourcemap's filename (otherwise, it is guessed from
+input)
 
 ```
 $ mincer-sourcemap file.js --source-map file.map
@@ -114,7 +123,9 @@ Generate with sourcemap's sourceRoot
 $ mincer-sourcemap file.js --source-map-root /
 ```
 
-Remove a path prefix from sourcemap's sources array of files
+Remove a path prefix from sourcemap's sources array of files. This is often
+useful when you trigger the build from another directory, not relative to the
+final web application root.
 
 ```
 $ mincer-sourcemap public/javascript/app.js --prefix public/javascript
@@ -128,14 +139,27 @@ $ mincer-sourcemap public/javascript/app.js --output public/javascript/app.bundl
 $ mincer-sourcemap public/javascript/app.js > public/javascript/app.bundle.js
 ```
 
-Specify the `in-source-map` option
+Specify the `in-source-map` option.
 
 ```
 $ mincer-sourcemap public/javascript/app.js --in-source-map public/javascript/app.map
+```
 
-# unless `--in-source-map` is explicitely set, the end of the input file
-# is parsed looking for an existing `sourceMappingURL` to use as
-# sourcemap input
+Unless `--in-source-map` is explicitely set, the end of the input file
+is parsed looking for an existing `sourceMappingURL` to use as
+sourcemap input. This is ofen useful if you wish to chain targets and
+invokation, or maybe generate proper sourcemapping for CoffeeScript generated
+with [CoffeeScriptRedux](http://michaelficarra.github.com/CoffeeScriptRedux/)
+
+```
+$ mincer-sourcemap assets/base.js --dev | mincer-sourcemap --sourcemap assets/base.min.js.map
+... No sourcemap option defined, but only a single entry file. Defaults sourcemap to assets/base.js.map ...
+... Generate sourcemap to assets/base.js.map ...
+... Found sourceMappingURL in input stream. Setting UglifyJS2 option to assets/base.js.map ...
+WARN: Couldn't figure out mapping for assets/base.min.js.js:1,0 → 1,1 []
+... Generate sourcemap to assets/base.min.js.map ...
+(function(){"use strict";"todomvc.com"===location.hostname&&function(e,t){var o=e.createElement(t),n=e.getElementsByTagName(t)[0];o.src="//www.google-analytics.com/ga.js",n.parentNode.insertBefore(o,n)}(document,"script")})(window);
+//@ sourceMappingURL=assets/base.min.js.map
 ```
 
 In any of the above scenarios, the resulting JS, minified or not, is
@@ -143,6 +167,8 @@ dumped to `stdout` (unless `--output` is set) whereas the according
 sourcemap is written manually, at the specified `--sourcemap` filepath,
 or based on file input (in the worst case, the sourcemap defaults to
 `mincer.map`)
+
+### CSS
 
 Concat with `-sass-debug-info` source location:
 
@@ -247,15 +273,6 @@ mapping would also become unecessary)
                       relative to the defined host.
 
 
-### options#type
-
-determine type of input, JS or CSS (defaults to CSS)
-XXX defaults based on stream input, should detect CSS from content
-
-### options#cssDebugHost
-
-cleanup host from protocol, is concat'd twice otherwise
-
 ### MinmapStream#prefix
 
 Uses `options.sourceMapPrefix` if defined to replace the first part of `filename`
@@ -296,13 +313,10 @@ has some issue setting up breakpoints - but filemapping is ok)
 
 Returns the minmap stream instance.
 
-### self#render
+### MinmapStream#css
 
-.set('filename', 'stdin')
-
-### pattern
-
-parse CSS and convert sass-debug-info if needed
+CSS generation, goes through each assets, render through `stylus` with
+debug-info, and write to the stream for each compiled chunk of CSS.
 
 ### MinmapStream#debugInfo
 
@@ -312,9 +326,17 @@ Helper to return the String of -sass-debug-info according to `filename` and
 This optionaly rewrite stuff like the filename (to be relative to an URL for
 instance instead of absolute filename) and the the -$engine-debug-info
 
+### MinmapStream#stylus
+
+Stylus renderer
+
+### MinmapStream#rework
+
+rework based, XXX switch to css-parse, css-stringify
+
 ### MinmapStream#each
 
-each async helper
+Each async helper
 
 ### MinmapStream#uglify
 
@@ -325,7 +347,7 @@ Returns the minmap stream instance.
 
 ### MinmapStream#esprima
 
-Esprima / Escodegen / Esmangle based generation
+Esprima / Escodegen / Esmangle based generation. **experimental**
 
 Based off https://gist.github.com/4230837
 
@@ -342,4 +364,3 @@ Takes a `filename` and `content` of JS, generate the esprima tree, optimize
 bundle pair of code / map string output.
 
 Returns the pair of `code` / `map` from `escodegen`
-

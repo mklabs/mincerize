@@ -1,16 +1,27 @@
 #!/usr/bin/env node
 
+var fs      = require('fs');
+var path    = require('path')
 var noptify = require('noptify')
 var minmap  = require('..');
 
 var program = noptify(process.argv);
 
-program.option('convert', '-c', 'Convert the HTML into a valid JS or CSS bundle', Boolean);
 program.option('grep', '-g', 'Only output assets matching the provided pattern', String);
+program.option('ignore', '-i', 'Ignore assets matching the provided pattern', String);
+program.option('bundle', '-b', 'Output valid JS or CSS bundle to stdout', Boolean);
+
+program.option('convert', '-c', 'Generate valid JS or CSS bundle from input and replace references to generated manifest(s)', Boolean);
+program.option('filename', '-f', 'Define the name of the input file, usefull for stdin type of input', String);
+program.option('dirname', '-dir', 'Directory value where manifest bundles are generated', String);
+
 program.option('css', 'Only output stylesheets', Boolean);
 program.option('js', 'Only output javascript', Boolean);
 
 var opts = program.parse();
+var files = opts.argv.remain;
+if(files.length && !opts.filename) opts.filename = files[0];
+
 program.collect(run);
 
 // XXX:
@@ -32,12 +43,15 @@ var Stream = require('stream').Stream;
 // order they appear in the input chunk of HTML.
 function MincerHtml(html, options) {
   options = this.options = options || {};
+  if(this.options.debug) this.inspect(options);
   this.body = html;
   this.tree = {};
   this.assets = [];
+  this.source = options.filename || options.source || 'index.html';
+  this.dirname = options.dirname || path.dirname(this.source);
 
-  this.matchCss = options.matchCss || /\s*<link.+href=['"](.+)['"]/;
-  this.matchJs = options.matchJs || /\s*<script.+src=['"](.+)['"]/;
+  this.matchCss = options.matchCss || /\s*<link.+href=['"]([^'"]+)['"]/;
+  this.matchJs = options.matchJs || /\s*<script.+src=['"]([^'"]+)['"]/;
 
   this.parse();
   process.nextTick(this.output.bind(this));
@@ -53,15 +67,17 @@ MincerHtml.prototype.parse = function parse(data) {
     var js = this.matchJs.test(l);
     var css = this.matchCss.test(l);
     return js || css;
-  }, this).map(function(line) {
-    var filepath = (line.match(this.matchCss) || [])[1];
-    if(!filepath) filepath = (line.match(this.matchJs) || [])[1];
-    return filepath || '';
-  }, this);
+  }, this).map(this.parseLine, this);
 
   this.assets = this.assets.concat(assets);
 
   return this;
+};
+
+MincerHtml.prototype.parseLine = function parseLine(line) {
+  var filepath = (line.match(this.matchCss) || [])[1];
+  if(!filepath) filepath = (line.match(this.matchJs) || [])[1];
+  return filepath || '';
 };
 
 MincerHtml.prototype.output = function output() {
@@ -70,16 +86,70 @@ MincerHtml.prototype.output = function output() {
   if(this.options.css) assets = this.filter(assets, '.css');
   if(this.options.js) assets = this.filter(assets, '.js');
   if(this.options.grep) assets = this.filter(assets, new RegExp(this.options.grep));
+  if(this.options.ignore) assets = assets.filter(function(asset) {
+    return !~asset.indexOf(this.options.ignore);
+  }, this);
 
+  if(this.options.bundle) return this.bundle(assets);
   if(this.options.convert) return this.convert(assets);
 
   assets.forEach(function(filename) {
-    this.emit('data', filename + '\n');
+    this.write(filename);
   }, this);
   return this;
 };
 
 MincerHtml.prototype.convert = function convert(assets) {
+  assets = assets || this.assets;
+  var dirname = this.dirname;
+
+  var css = {
+    file: path.join(dirname, 'manifest.css'),
+    code: this.css(this.filter(assets, '.css'), true)
+  };
+
+  var js = {
+    file: path.join(dirname, 'manifest.js'),
+    code: this.js(this.filter(assets, '.js'), true)
+  };
+
+  // cleanup html from previous link / scripts
+
+  var lines = this.body.split('\n');
+  var body = lines.filter(function(l) {
+    var js = this.matchJs.test(l);
+    var css = this.matchCss.test(l);
+    var asset = this.parseLine(l);
+    if(!(js || css)) return true;
+    return !~assets.indexOf(asset);
+  }, this).join('\n');
+
+  // reaad a single link reference to the manifest.css bundle
+  body = body.replace(/(\s*)<\/head>/, function(match, indent) {
+    indent = indent.replace(/\n/g, '');
+    return '\n' + indent + (indent || '  ') + util.format('<link rel="stylesheet" href="%s">', css.file);
+  });
+
+  // same for js, a single script reference to the manifest.js bundle but right
+  // before the body end tag
+  body = body.replace(/(\s*)<\/body>/, function(match, indent) {
+    indent = indent.replace(/\n/g, '');
+    return '\n' + indent + (indent || '  ') + util.format('<script src="%s"></script>', js.file);
+  });
+
+
+  var self = this.log('... Writing CSS manifest bundle to %s ... ', css.file);
+  fs.writeFile(css.file, css.code, function(err) {
+    if(err) return self.emit('error', err);
+    self.log('... Writing JS manifest bundle to %s ... ', js.file);
+    fs.writeFile(js.file, js.code, function(err) {
+      if(err) return self.emit('error', err);
+      self.write(body);
+    });
+  });
+};
+
+MincerHtml.prototype.bundle = function bundle(assets) {
   assets = assets || this.assets;
   var css = this.filter(assets, '.css');
   var js = this.filter(assets, '.js');
@@ -92,9 +162,10 @@ MincerHtml.prototype.convert = function convert(assets) {
   return this;
 };
 
-MincerHtml.prototype.css = function css(styles) {
+MincerHtml.prototype.css = function css(styles, resume) {
   if(typeof styles === 'string') styles = styles.split(' ');
   styles = Array.isArray(styles) ? styles : [styles];
+  if(resume) this.pause();
   this.write('/** Generated CSS bundle ' + new Date() + '**/');
   this.write();
   this.write('/*');
@@ -103,17 +174,20 @@ MincerHtml.prototype.css = function css(styles) {
     this.write('= require ' + file);
   }, this);
   this.write().write('*/');
+  if(resume) return this.resume();
   return this;
 };
 
-MincerHtml.prototype.js = function css(scripts) {
+MincerHtml.prototype.js = function css(scripts, resume) {
   if(typeof scripts === 'string') scripts = scripts.split(' ');
   scripts = Array.isArray(scripts) ? scripts : [scripts];
+  if(resume) this.pause();
   this.write('// Generated JS bundle ' + new Date());
   this.write();
   scripts.forEach(function(file) {
     this.write('//= require ' + file);
   }, this);
+  if(resume) return this.resume();
   return this;
 };
 
@@ -128,8 +202,19 @@ MincerHtml.prototype.write = function write(chunk, endline) {
   endline = endline === false ? '' : (endline || '\n');
   var data = (chunk || '') + '';
   if(data === '[object Object]') data = JSON.stringify(chunk, null, 2);
-  this.emit('data', data + endline);
+  if(this._resumed) this._resumedBuffer.push(data);
+  else this.emit('data', data + endline);
   return this;
+};
+
+MincerHtml.prototype.pause = function pause() {
+  this._resumed = true;
+  this._resumedBuffer = [];
+};
+
+MincerHtml.prototype.resume = function resume() {
+  this._resumed = false;
+  return this._resumedBuffer.join('\n');
 };
 
 // XXX use debug package
@@ -147,6 +232,6 @@ MincerHtml.prototype.log = function log() {
 
 MincerHtml.prototype.inspect = function inspect(name, obj) {
   if(!obj) obj = name, name = '';
-  console.error.apply(name, util.inspect(obj, false, 2, true));
+  console.error(name, util.inspect(obj, false, 2, true));
   return this;
 };

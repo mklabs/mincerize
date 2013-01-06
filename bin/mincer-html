@@ -18,21 +18,59 @@ program.option('dirname', '-dir', 'Directory value where manifest bundles are ge
 program.option('css', 'Only output stylesheets', Boolean);
 program.option('js', 'Only output javascript', Boolean);
 
-var opts = program.parse();
-var files = opts.argv.remain;
-if(files.length && !opts.filename) opts.filename = files[0];
+var manifest = noptify();
 
-program.collect(run);
+manifest.program('mincer-html manifest');
+manifest.option('manifest', '-m', 'Path to manifest.json file');
+
+manifest.run(function() {
+  manifest.collect(function(err, result) {
+    if(err) throw err;
+    var html = new MincerHtml(result, manifest.nopt);
+    var manifestfile = manifest.nopt.manifest;
+    if(!manifestfile) throw new Error('You must provide the `--manifest` option');
+    var assets = require(path.resolve(manifestfile)).assets;
+    var dir = path.dirname(manifestfile);
+
+    html.assets = html.assets.map(function(htmlAsset) {
+      var reved = Object.keys(assets).filter(function(asset) {
+        var toMatch = htmlAsset.replace(/-[\da-f]{32}/, '');
+        return toMatch === asset;
+      })[0];
+
+      if(!reved) return htmlAsset;
+
+      var asset = assets[reved];
+      html.body = html.body.replace(new RegExp('<script.+src=[\'"]' + htmlAsset + '[\'"]'), function(m) {
+        return m.replace(/src=['"][^'"]+['"]/, 'src="' + path.join(dir, asset) + '"');
+      });
+
+      html.body = html.body.replace(new RegExp('<link.+=[\'"]' + htmlAsset + '[\'"]'), function(m) {
+        return m.replace(/href=['"][^'"]+['"]/, 'href="' + path.join(dir, asset) + '"');
+      });
+
+      return assets[reved];
+    });
+
+    console.log(html.body);
+  });
+});
+
+program.command('manifest', manifest);
+
+var opts = program.parse();
+program.run(function(done) {
+  program.collect(function(err, result) {
+    if(err) throw err;
+    var html = new MincerHtml(result, opts);
+    html.pipe(process.stdout)
+  });
+});
 
 // XXX:
 //
 //    program.pipe(new MincerHtml).pipe(process.stdout);
 //
-
-function run(err, result) {
-  var html = new MincerHtml(result, opts);
-  html.pipe(process.stdout)
-}
 
 // XXX lib/mincer-html.js
 

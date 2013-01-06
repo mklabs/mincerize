@@ -1,74 +1,29 @@
+#!/usr/bin/env node
 
-var fs      = require('fs');
 var noptify = require('noptify')
 var minmap  = require('..');
 
 var program = noptify(process.argv);
+
+program.option('convert', '-c', 'Convert the HTML into a valid JS or CSS bundle', Boolean);
+program.option('grep', '-g', 'Only output assets matching the provided pattern', String);
+program.option('css', 'Only output stylesheets', Boolean);
+program.option('js', 'Only output javascript', Boolean);
+
 var opts = program.parse();
-var files = opts.argv.remain;
+program.collect(run);
 
-// Stream EVERYTHING
-// We should be able to do crazy stuff like this
+// XXX:
 //
-//    # parse out the JS / CSS assets, output the listing
-//    $ cat index.html | mincer-html
-//
-//    # mincer-compile is a simple wrapper on top of mincer, to be able to read
-//    # from stdin mainly.
-//
-//    # read the input file listing, pass them all to mincer output the concatanated result
-//    # CSS / JS can be mixed, but another stream may read from this path and write back each one to file system.
-//    $ cat index.html | mincer-html | mincer-compile
-//
-//    # concat / minification / sourcemap compilation step
-//    # In case of mixed CSS / JS input, outputs the compiled output with comment
-//    # filepath info (eg. `/*** path/to/file.css ***/`) between each file.
-//    #
-//    # This may generate a bunch of *.map files, next to the original file
-//    $ cat index.html | mincer-html | mincer-compile | mincer-sourcemap
-//
-//    # revving step, simply updates the filepath to the versioned one,
-//    # based on content hash.
-//    $ cat index.html | mincer-html | mincer-compile | mincer-sourcemap | mincer-rev
-//
-//    # write back to the filesytem step
-//    # this splits out a chunk compiled JS / CSS and writes each part back to
-//    # the filesystem, based on the comment filepath value.
-//    #
-//    # The output is the same as the input.
-//    $ cat index.html | ... | mincer-rev | mincer-write
-//
-//    # update references in `index.html` each filepath that appear in the input stream
-//    $ cat index.html | ... | mincer-write | mincer-html index.html
-var idea = 'do it';
-
-// Or simply, which include everything
-
-// $ cat index.html | mincer-build
-//
-// # parse out index.html
-// # get back the list of assets to precompile
-// # for each asset, compile through mincer (include dir relative to index.html)
-// # compile sourcemapping for each asset
-// # compute file sha1 for each file.
-// # replace the original filename to the final one
+//    program.pipe(new MincerHtml).pipe(process.stdout);
 //
 
-var collect = files.length ? readFiles.bind(null, files) : program.stdin.bind(program);
-collect(run);
-
-function readFiles(files, done) {
-  var data = '';
-  (function read(file) {
-    if(!file) return done(null, data);
-    fs.readFile(file, 'utf8', function(err, body) {
-      if(err) return done(err);
-      data += body;
-      read(files.shift());
-    });
-  })(files.shift());
+function run(err, result) {
+  var html = new MincerHtml(result, opts);
+  html.pipe(process.stdout)
 }
 
+// XXX lib/mincer-html.js
 
 var util = require('util');
 var Stream = require('stream').Stream;
@@ -76,12 +31,10 @@ var Stream = require('stream').Stream;
 // Parses a chunk of HTML and returns the lisf of JS and CSS assets in the
 // order they appear in the input chunk of HTML.
 function MincerHtml(html, options) {
-  options = options || {};
+  options = this.options = options || {};
   this.body = html;
   this.tree = {};
   this.assets = [];
-  this.css = [];
-  this.js = [];
 
   this.matchCss = options.matchCss || /\s*<link.+href=['"](.+)['"]/;
   this.matchJs = options.matchJs || /\s*<script.+src=['"](.+)['"]/;
@@ -112,13 +65,88 @@ MincerHtml.prototype.parse = function parse(data) {
 };
 
 MincerHtml.prototype.output = function output() {
-  this.assets.forEach(function(filename) {
+  var assets = this.assets;
+
+  if(this.options.css) assets = this.filter(assets, '.css');
+  if(this.options.js) assets = this.filter(assets, '.js');
+  if(this.options.grep) assets = this.filter(assets, new RegExp(this.options.grep));
+
+  if(this.options.convert) return this.convert(assets);
+
+  assets.forEach(function(filename) {
     this.emit('data', filename + '\n');
   }, this);
+  return this;
 };
 
-function run(err, result) {
-  console.log('run baby run');
-  var html = new MincerHtml(result);
-  html.pipe(process.stdout)
-}
+MincerHtml.prototype.convert = function convert(assets) {
+  assets = assets || this.assets;
+  var css = this.filter(assets, '.css');
+  var js = this.filter(assets, '.js');
+
+  if(css.length) {
+    this.css(css);
+    if(js.length) this.write();
+  }
+  if(js.length) this.js(js);
+  return this;
+};
+
+MincerHtml.prototype.css = function css(styles) {
+  if(typeof styles === 'string') styles = styles.split(' ');
+  styles = Array.isArray(styles) ? styles : [styles];
+  this.write('/** Generated CSS bundle ' + new Date() + '**/');
+  this.write();
+  this.write('/*');
+  this.write();
+  styles.forEach(function(file) {
+    this.write('= require ' + file);
+  }, this);
+  this.write().write('*/');
+  return this;
+};
+
+MincerHtml.prototype.js = function css(scripts) {
+  if(typeof scripts === 'string') scripts = scripts.split(' ');
+  scripts = Array.isArray(scripts) ? scripts : [scripts];
+  this.write('// Generated JS bundle ' + new Date());
+  this.write();
+  scripts.forEach(function(file) {
+    this.write('//= require ' + file);
+  }, this);
+  return this;
+};
+
+MincerHtml.prototype.filter = function filter(list, extension) {
+  var reg = extension instanceof RegExp ? extension : new RegExp(extension + '$');
+  return list.filter(function(item) {
+    return reg.test(item);
+  });
+};
+
+MincerHtml.prototype.write = function write(chunk, endline) {
+  endline = endline === false ? '' : (endline || '\n');
+  var data = (chunk || '') + '';
+  if(data === '[object Object]') data = JSON.stringify(chunk, null, 2);
+  this.emit('data', data + endline);
+  return this;
+};
+
+// XXX use debug package
+MincerHtml.prototype.debug = function debug() {
+  if(this.options.debug) {
+    console.error.apply(console, arguments);
+  }
+  return this;
+};
+
+MincerHtml.prototype.log = function log() {
+  console.error.apply(console, arguments);
+  return this;
+};
+
+MincerHtml.prototype.inspect = function inspect(name, obj) {
+  if(!obj) obj = name, name = '';
+  console.error.apply(name, util.inspect(obj, false, 2, true));
+  return this;
+};

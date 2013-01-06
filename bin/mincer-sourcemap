@@ -39,7 +39,7 @@ var opts = noptify(process.argv, { program: 'mincer-sourcemap' })
 
   .option('css-debug-prefix', 'Only relevant with css-debug-host and acts like source-map-prefix')
 
-  .option('css', 'Turn the compilation mode into `.css`. Useful for stdin input. JS is the default mode.')
+  .option('css', 'Turn the compilation mode into `.css`. Useful for stdin input. JS is the default mode.', Boolean)
 
   .shorthands({
     sourcemap        : '--source-map',

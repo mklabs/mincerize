@@ -79,10 +79,11 @@ in development environment, as it's significantly faster).
 The stream also parses the input and the end of the file for initial
 `sourceMappingURL` to use as `inSourceMap` option.
 
-For CSS type of inputs, each CSS file is compiled through `stylus` with firebug
-options enabled, generating `-stylus-debug-info` converted back to
-`-sass-debug-info`. The stream also lets you rewrite the filename location to
-be based on HTTP protocol, instead of the usual `file://absolute/path/name`.
+For CSS type of inputs, each CSS file is parsed through `rework, generating
+`-sass-debug-info` for each selector (unless there is already debug
+information, case of pre-processor compiled CSS). The stream also lets you
+rewrite the filename location to be based on HTTP protocol, instead of the
+usual `file://absolute/path/name`.
 
 ## Usage
 
@@ -237,11 +238,10 @@ uglify-js2 minification with sourcemap output.
 For CSS type of input:
 
 Turn the type into `.css` with `--css`, it'll then concat the files , generate
-debug-info through stylus, convert the debugging info and output the result.
+debug-info, convert the debugging info and output the result.
 
 There is no minification for CSS yet, untill proper V3 sourcemap generation
-is done through csso / cssp (the stylus wrapper to generate debug-info
-mapping would also become unecessary)
+is done through csso / cssp.
 
 
 - str              - The String of JavaScript to parse and generate from

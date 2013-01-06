@@ -54,3 +54,54 @@ Or simply, which include everything
 - Compute file sha1 for each file.
 - Replace the original filename to the final one
 
+## API
+
+As for the JS API, every command is a basic `noptify` program in the `bin`
+folder, each one using the according stream in `lib/`.
+
+```js
+var minmap = require('minmap');
+
+var program = noptify();
+
+// ... program config options, shorthands, usage etc ...
+
+// and then ...
+
+program.pipe(new minmap.HtmlStream).pipe(process.stdout);
+```
+
+A command file that pipe streams in a single raw:
+
+- Parse out index.html
+- get back the list of assets to precompile
+- For each asset, compile through mincer (include dir relative to index.html)
+- Compile sourcemapping for each asset
+- Compute file sha1 for each file.
+- Replace the original filename to the final one
+- Minify the resulting HTML
+
+```js
+program
+  .pipe(new minmap.HtmlStream)
+  .pipe(new minmap.MincerStream)
+  .pipe(new minmap.SourcemapStream)
+  .pipe(new minmap.RevStream)
+  .pipe(new minmap.WriteStream)
+  .pipe(new minmap.UseminStream({ file: 'index.html' }))
+  .pipe(new minmap.HtmlMinifierStream)
+  .pipe(process.stdout);
+```
+
+
+```js
+// also valid
+program.pipe(minmap.MincerStream());
+
+program
+  .pipe(minmap('html'))
+  .pipe(minmap('html'))
+  .pipe(process.stdout)
+
+minmap('mincer', options).pipe(process.stdout);
+```

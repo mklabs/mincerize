@@ -1,0 +1,6 @@
+{
+"version": "3",
+"mappings": ";EAEE,KAAK,EAAE,uBAAuB;;;;ECE9B,OAAO,EAAE,IAAI",
+"sources": ["sass\/app.scss","sass\/index.scss"],
+"file": "sass-sourcemap.css"
+}

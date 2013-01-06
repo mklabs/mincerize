@@ -3,6 +3,8 @@ BUILD_DIR ?= build
 
 PATH := ./node_modules/.bin:$(PATH)
 
+all: mincerize cssmap serve
+
 clean-dry:
 	git clean -fdx --dry-run -e node_modules
 
@@ -15,7 +17,11 @@ $(BUILD_DIR):
 
 mincerize: $(BUILD_DIR)
 
-sourcemap:
-	mincer-sourcemap
+cssmap:
+	bundle exec sass sass/index.scss sass-sourcemap.css --scss --sourcemap --style expanded
+
+serve:
+	serve
+
 
 .PHONY: clean-dry clean mincerize

@@ -1,3 +1,5 @@
 *.map
 *.min.js
 *.min.css
+.sass-cache
+Gemfile.lock

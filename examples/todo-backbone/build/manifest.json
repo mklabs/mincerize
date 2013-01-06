@@ -1,0 +1,20 @@
+{
+  "assets": {
+    "assets/manifest.css": "assets/manifest-c90e2b9d1a64c4808485fcb0926ec942.css",
+    "assets/manifest.js": "assets/manifest-7299517128c066088c17fece94b9013d.js"
+  },
+  "files": {
+    "assets/manifest-c90e2b9d1a64c4808485fcb0926ec942.css": {
+      "logical_path": "assets/manifest.css",
+      "mtime": "2013-01-06T03:31:20.000Z",
+      "size": 7927,
+      "digest": "c90e2b9d1a64c4808485fcb0926ec942"
+    },
+    "assets/manifest-7299517128c066088c17fece94b9013d.js": {
+      "logical_path": "assets/manifest.js",
+      "mtime": "2013-01-06T03:31:20.000Z",
+      "size": 139111,
+      "digest": "7299517128c066088c17fece94b9013d"
+    }
+  }
+}

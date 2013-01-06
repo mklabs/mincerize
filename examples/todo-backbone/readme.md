@@ -5,6 +5,27 @@ To start the webserver and browse the example, simply run:
 $ npm install && npm start
 ```
 
+## Synopsis
+
+Start from index.html, ends up with mincer.html and revved CSS / JS with sourcemaps.
+
+```
+# list assets
+$ cat index.html | mincer-html
+
+# generate manifest and HTML
+$ cat index.html | mincer-html -c -i ie.js --dirname assets > mincer.html
+
+# list assets
+$ cat mincer.html | mincer-html
+
+# generate bundles
+$ mincer $(mincer-html mincer.html -grep manifest) -o build
+
+# replace reference in HTML to the final revved bundle
+$ mincer-html -
+```
+
 
 ### Examples
 

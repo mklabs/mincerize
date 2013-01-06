@@ -1,4 +1,4 @@
-// Generated JS bundle Sun Jan 06 2013 03:59:38 GMT+0100 (CET)
+// Generated JS bundle Sun Jan 06 2013 04:31:20 GMT+0100 (CET)
 
 //= require assets/base.js
 //= require assets/jquery.min.js

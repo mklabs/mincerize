@@ -1,0 +1,11 @@
+{
+  "name": "todo-backbone",
+  "description": "An example of todo app using sprockets / mincer bundles to manage assets",
+  "version": "0.0.0",
+  "devDependencies": {
+    "serve": "~1.1.0"
+  },
+  "scripts": {
+    "start": "serve"
+  }
+}

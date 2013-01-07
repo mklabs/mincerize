@@ -1,0 +1,11 @@
+/* line 11, /Users/mk/src/mklabs/cssmap/styles/less/index.less */
+.box {
+  color: #bddf50;
+  border-color: #edf5d3;
+}
+/* line 14, /Users/mk/src/mklabs/cssmap/styles/less/index.less */
+.box div {
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}

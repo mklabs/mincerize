@@ -6,5 +6,8 @@
     "css-parse": "https://github.com/mklabs/css-parse/archive/sourceloc.tar.gz",
     "css-stringify": "https://github.com/mklabs/css-stringify/archive/sourcemap.tar.gz",
     "nopt": "*"
+  },
+  "scripts": {
+    "test": "make"
   }
 }

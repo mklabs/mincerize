@@ -1,15 +1,10 @@
 {
-  "author": "",
-  "name": "mklabs",
+  "name": "css-sourcemap",
+  "author": "mklabs",
   "version": "0.0.0",
   "dependencies": {
-    "css-stringify": "~1.0.4",
-    "css-parse": "~1.0.4",
-    "nopt": "~2.0.0"
-  },
-  "devDependencies": {},
-  "optionalDependencies": {},
-  "engines": {
-    "node": "*"
+    "css-parse": "https://github.com/mklabs/css-parse/archive/sourceloc.tar.gz",
+    "css-stringify": "https://github.com/mklabs/css-stringify/archive/sourcemap.tar.gz",
+    "nopt": "*"
   }
 }

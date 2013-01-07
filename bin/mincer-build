@@ -1,0 +1,44 @@
+#!/usr/bin/env node
+
+// Single stream to build and optimize assets based on a chunk of HTML stream
+
+// Should even work on remote URL, in this mode, every assets should be
+// download locally in a build dir or something.
+//
+//    $ curl http://mkla.bz | mincer-build
+//    ... Parse assets from htlm content ...
+//    ... Download each file locally ...
+//    ... etc etc ...
+//
+// But for now let's keep it local
+//
+//  $ cat index.html | mincer-build
+
+var noptify     = require('noptify')
+var MincerBuild = require('../lib/mincer-build');
+
+var program = noptify(process.argv);
+
+// Options
+
+program
+  .option('debug', '-d', 'Turn on debugging info', Boolean)
+  .option('include', '-I', 'Adds the directory to the Mincer load path', Array)
+  .option('output', '-o', 'Copy provided assets into the provided directory', String)
+
+  .on('help', function() {
+    console.log();
+    console.log('Examples:');
+    console.log();
+    console.log('    $ mincer-build -I ./components -I ./app/assets/ -o build');
+  });
+
+
+var opts = program.parse();
+
+program.collect(function(err, result) {
+  if(err) throw err;
+  var build = new MincerBuild(result, opts);
+  build.pipe(process.stdout)
+});
+

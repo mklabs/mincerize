@@ -3,3 +3,5 @@
 *.min.css
 .sass-cache
 Gemfile.lock
+_*
+examples/site/

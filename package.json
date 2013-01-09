@@ -13,8 +13,8 @@
     "uglify-js2": "~2.1.11",
     "css-parse": "~1.0.4",
     "rework": "~0.10.2",
-    "noptify": "0.0.1",
-    "mincer": "~0.4.3"
+    "mincer": "~0.4.3",
+    "noptify": "latest"
   },
   "scripts": {
     "test": "mincer -I ./ examples/todo-backbone/assets/manifest.js | mincer-sourcemap --source-map-prefix examples/todo-backbone:''"

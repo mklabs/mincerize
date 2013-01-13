@@ -24,6 +24,7 @@ var program = noptify(process.argv);
 program
   .option('debug', '-d', 'Turn on debugging info', Boolean)
   .option('include', '-I', 'Adds the directory to the Mincer load path', Array)
+  .option('ignore', 'Ignores the given string from assets to compile', Array)
   .option('output', '-o', 'Copy provided assets into the provided directory', String)
 
   .on('help', function() {
@@ -31,6 +32,7 @@ program
     console.log('Examples:');
     console.log();
     console.log('    $ mincer-build -I ./components -I ./app/assets/ -o build');
+    console.log('    $ mincer-build --ignore googleapi');
   });
 
 

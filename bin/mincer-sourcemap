@@ -31,16 +31,6 @@ var opts = noptify(process.argv, { program: 'mincer-sourcemap' })
   // Allows you to prevent the minification process, only generates the sourcemap file.
   .option('nocompress', 'Outputs JS in beautified mode instead of the standard minification', Boolean)
 
-  // css-debug related options
-
-  // Debug host, when defined generates filename mapping based on HTTP protocol
-  // instead of the usual `file://` + absolute filepath.
-  .option('css-debug-host', 'Generates `-sass-debug-info` with filename based on this HTTP host (instead of absolute filepath)')
-
-  .option('css-debug-prefix', 'Only relevant with css-debug-host and acts like source-map-prefix')
-
-  .option('css', 'Turn the compilation mode into `.css`. Useful for stdin input. JS is the default mode.', Boolean)
-
   .shorthands({
     sourcemap        : '--source-map',
     prefix           : '--source-map-prefix',
@@ -49,11 +39,6 @@ var opts = noptify(process.argv, { program: 'mincer-sourcemap' })
     nominify         : '--nocompress',
     'no-minify'      : '--nocompress',
     'no-compress'    : '--nocompress',
-
-    'css-host'       : '--css-debug-host',
-    'host'           : '--css-debug-host',
-    'css-prefix'     : '--css-debug-prefix',
-
     'dev'            : '--nocompress'
   })
 
@@ -64,10 +49,6 @@ var opts = noptify(process.argv, { program: 'mincer-sourcemap' })
     console.log('    # js');
     console.log('    $ mincer assets/javascript/manifest.js | mincer-sourcemap');
     console.log('    $ mincer-sourcemap assets/javascript/app.bundle.js');
-    console.log();
-    console.log('    # css');
-    console.log('    $ cat public/stylesheets/app.bundle.css | mincer-sourcemap --css');
-    console.log('    $ mincer-sourcemap public/stylesheets/app.bundle.css --css-debug-host http://localhost:3000');
     console.log();
   })
 

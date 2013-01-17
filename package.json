@@ -14,7 +14,8 @@
     "css-parse": "~1.0.4",
     "rework": "~0.10.2",
     "mincer": "~0.4.3",
-    "noptify": "latest"
+    "noptify": "latest",
+    "debug": "~0.7.0"
   },
   "scripts": {
     "test": "mincer -I ./ examples/todo-backbone/assets/manifest.js | mincer-sourcemap --source-map-prefix examples/todo-backbone:''"

@@ -7,12 +7,7 @@
     "bin": "bin"
   },
   "dependencies": {
-    "esmangle": "0.0.9-1",
-    "esprima": "~1.0.2",
-    "escodegen": "0.0.15",
     "uglify-js2": "~2.1.11",
-    "css-parse": "~1.0.4",
-    "rework": "~0.10.2",
     "mincer": "~0.4.3",
     "noptify": "latest",
     "debug": "~0.7.0"

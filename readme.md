@@ -9,16 +9,16 @@ compile and replace JS or CSS files based on an HTML file (or template).
 This command takes an HTML file and returns a list of matching assets,
 JS or CSS file.
 
-  Usage: mincer-html [options]
+    Usage: mincer-html [options]
 
-  Options:
+    Options:
 
-    -h, --help                output usage information
-    -g, --grep <grep>         Only output assets matching the provided pattern
-    -i, --ignore <ignore>     Ignore assets matching the provided pattern
-    -f, --filename <filname>  Define the name of the input file
-    --css                     Only output stylesheets
-    --js                      Only output javascript
+      -h, --help                output usage information
+      -g, --grep <grep>         Only output assets matching the provided pattern
+      -i, --ignore <ignore>     Ignore assets matching the provided pattern
+      -f, --filename <filname>  Define the name of the input file
+      --css                     Only output stylesheets
+      --js                      Only output javascript
 
 
 **Example**
@@ -49,7 +49,7 @@ This command takes an HTML file, and:
       -f, --filename <filname>  Define the name of the input file
 
 
-  Examples:
+    Examples:
 
       $ mincer-build -I ./bower_components -I ./app/assets/ -o build -f index.html
       $ mincer-build --ignore googleapi -f index.html

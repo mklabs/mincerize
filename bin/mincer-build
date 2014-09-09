@@ -1,46 +1,47 @@
 #!/usr/bin/env node
 
-// Single stream to build and optimize assets based on a chunk of HTML stream
-
-// Should even work on remote URL, in this mode, every assets should be
-// download locally in a build dir or something.
-//
-//    $ curl http://mkla.bz | mincer-build
-//    ... Parse assets from htlm content ...
-//    ... Download each file locally ...
-//    ... etc etc ...
-//
-// But for now let's keep it local
-//
-//  $ cat index.html | mincer-build
-
-var noptify     = require('noptify')
+var fs          = require('fs');
+var path        = require('path')
+var exists      = fs.existsSync;
+var program     = require('commander')
 var MincerBuild = require('../lib/mincer-build');
 
-var program = noptify(process.argv);
-
 // Options
+function list(val) {
+  return val.split(',');
+}
 
 program
-  .option('debug', '-d', 'Turn on debugging info', Boolean)
-  .option('include', '-I', 'Adds the directory to the Mincer load path', Array)
-  .option('ignore', 'Ignores the given string from assets to compile', Array)
-  .option('output', '-o', 'Copy provided assets into the provided directory', String)
+  .option('-d, --debug', 'Turn on debugging info')
+  .option('-I, --include <path>', 'Adds the directory to the Mincer load path. Comma separated list of values', list)
+  .option('-i, --ignore <ignore>', 'Ignores the given string from assets to compile (relative to input file). Comma separated list of values', list)
+  .option('-o, --output', 'Copy provided assets into the provided directory')
+  .option('-f, --filename <filname>', 'Define the name of the input file')
 
-  .on('help', function() {
+  .on('--help', function() {
     console.log();
     console.log('Examples:');
     console.log();
-    console.log('    $ mincer-build -I ./components -I ./app/assets/ -o build');
-    console.log('    $ mincer-build --ignore googleapi');
-  });
+    console.log('    $ mincer-build -I ./bower_components -I ./app/assets/ -o build -f index.html');
+    console.log('    $ mincer-build --ignore googleapi -f index.html');
+    console.log();
+  })
+  .parse(process.argv);
 
+// Run
+if (!program.filename) throw new Error('Missing Input HTML filename');
+if (!exists(program.filename)) throw new Error('HTML input filename does not exist');
 
-var opts = program.parse();
-
-program.collect(function(err, result) {
-  if(err) throw err;
-  var build = new MincerBuild(result, opts);
-  build.pipe(process.stdout)
+fs.readFile(program.filename, 'utf8', function(err, body) {
+  if (err) throw err;
+  run(body);
 });
 
+// Main function, takes a HTML input and output the modified body, with revved assets.
+function run(result) {
+  var build = new MincerBuild(result, program);
+
+  build.on('end', function() {
+    console.log(build.body);
+  });
+}

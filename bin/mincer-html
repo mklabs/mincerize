@@ -1,79 +1,38 @@
 #!/usr/bin/env node
 
+var fs         = require('fs');
 var path       = require('path')
-var noptify    = require('noptify')
+var program    = require('commander')
 var MincerHtml = require('../lib/mincer-html');
-
-// Program
-
-var program = noptify(process.argv);
+var exists     = fs.existsSync;
 
 // Options
 
+function list(val) {
+  return val.split(',');
+}
+
 program
-  .option('grep', '-g', 'Only output assets matching the provided pattern', String)
-  .option('ignore', '-i', 'Ignore assets matching the provided pattern', String)
-  .option('bundle', '-b', 'Output valid JS or CSS bundle to stdout', Boolean)
+  .option('-g, --grep <grep>', 'Only output assets matching the provided pattern', list)
+  .option('-i, --ignore <ignore>', 'Ignore assets matching the provided pattern', list)
+  .option('-f, --filename <filname>', 'Define the name of the input file')
 
-  .option('convert', '-c', 'Generate valid JS or CSS bundle from input and replace references to generated manifest(s)', Boolean)
-  .option('filename', '-f', 'Define the name of the input file, usefull for stdin type of input', String)
-  .option('dirname', '-dir', 'Directory value where manifest bundles are generated', String)
+  .option('--css', 'Only output stylesheets')
+  .option('--js', 'Only output javascript')
+  .parse(process.argv);
 
-  .option('css', 'Only output stylesheets', Boolean)
-  .option('js', 'Only output javascript', Boolean)
+// Run
+if (!program.filename) throw new Error('Missing Input HTML filename');
+if (!exists(program.filename)) throw new Error('HTML input filename does not exist');
 
-
-// Manifest test
-//
-// XXX bin/mincer-manifest lib/mincer-manifest
-var manifest = noptify();
-
-// add command
-program.command('manifest', manifest);
-
-// define manifest program
-manifest.program('mincer-html manifest');
-manifest.option('manifest', '-m', 'Path to manifest.json file');
-manifest.run(function() {
-  manifest.collect(function(err, result) {
-    if(err) throw err;
-    var html = new MincerHtml(result, manifest.nopt);
-    var manifestfile = manifest.nopt.manifest;
-    if(!manifestfile) throw new Error('You must provide the `--manifest` option');
-    var assets = require(path.resolve(manifestfile)).assets;
-    var dir = path.dirname(manifestfile);
-    html.assets = html.assets.map(function(htmlAsset) {
-      var reved = Object.keys(assets).filter(function(asset) {
-        var toMatch = htmlAsset.replace(/-[\da-f]{32}/, '');
-        return toMatch === asset;
-      })[0];
-
-      if(!reved) return htmlAsset;
-
-      var asset = assets[reved];
-      html.body = html.body.replace(new RegExp('<script.+src=[\'"]' + htmlAsset + '[\'"]'), function(m) {
-        return m.replace(/src=['"][^'"]+['"]/, 'src="' + path.join(dir, asset) + '"');
-      });
-      html.body = html.body.replace(new RegExp('<link.+=[\'"]' + htmlAsset + '[\'"]'), function(m) {
-        return m.replace(/href=['"][^'"]+['"]/, 'href="' + path.join(dir, asset) + '"');
-      });
-
-      return assets[reved];
-    });
-
-    console.log(html.body);
-  });
+fs.readFile(program.filename, 'utf8', function(err, body) {
+  if (err) throw err;
+  run(body);
 });
 
-
-// Parse and run
-
-var opts = program.parse();
-if(!module.parent) program.run(function(done) {
-  program.collect(function(err, result) {
-    if(err) throw err;
-    var html = new MincerHtml(result, opts);
-    html.pipe(process.stdout)
-  });
-});
-
+// Main function, takes a HTML input and output to stdout the list of assets
+function run(result) {
+  var html = new MincerHtml(result, program);
+  console.log(html.assets.join('\n'));
+  return html;
+}

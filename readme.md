@@ -35,6 +35,7 @@ This command takes an HTML file, and:
 3. Replace each reference in input HTML to the new, revved, one
 4. Outputs the result to stdout
 
+---
 
     Usage: mincer-build [options]
 
@@ -53,3 +54,6 @@ This command takes an HTML file, and:
       $ mincer-build -I ./bower_components -I ./app/assets/ -o build -f index.html
       $ mincer-build --ignore googleapi -f index.html
 
+**Example**
+
+    $ mincer-build -f examples/todo-backbone/index.html -I bower_components > new.html

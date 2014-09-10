@@ -1,0 +1,27 @@
+{
+  "assets": {
+    "assets/manifest.css": "assets/manifest-12fdb5fffcbb78caa9307e319ae98447.css",
+    "assets/manifest.js": "assets/manifest-cf3d14a9a0723dad22a04c1f4fe81bc3.js",
+    "sass-sourcemap.css": "sass-sourcemap-59244891f6b5dc2b217281d3d1e12e67.css"
+  },
+  "files": {
+    "assets/manifest-12fdb5fffcbb78caa9307e319ae98447.css": {
+      "logical_path": "assets/manifest.css",
+      "mtime": "2014-09-08T18:13:11.000Z",
+      "size": 7894,
+      "digest": "12fdb5fffcbb78caa9307e319ae98447"
+    },
+    "assets/manifest-cf3d14a9a0723dad22a04c1f4fe81bc3.js": {
+      "logical_path": "assets/manifest.js",
+      "mtime": "2014-09-08T18:13:11.000Z",
+      "size": 139079,
+      "digest": "cf3d14a9a0723dad22a04c1f4fe81bc3"
+    },
+    "sass-sourcemap-59244891f6b5dc2b217281d3d1e12e67.css": {
+      "logical_path": "sass-sourcemap.css",
+      "mtime": "2014-09-08T18:13:11.000Z",
+      "size": 130,
+      "digest": "59244891f6b5dc2b217281d3d1e12e67"
+    }
+  }
+}

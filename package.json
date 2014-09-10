@@ -20,7 +20,8 @@
     "coffee-script": "~1.8.0",
     "stylus": "~0.48.1",
     "less": "~1.7.5",
-    "jade": "~1.6.0"
+    "jade": "~1.6.0",
+    "handlebars": "~2.0.0"
   },
   "scripts": {
     "test": "mocha test --spec"

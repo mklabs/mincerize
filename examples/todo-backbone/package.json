@@ -9,6 +9,8 @@
     "start": "serve"
   },
   "dependencies": {
-    "mincer": "~0.4.3"
+    "mincer": "~0.4.3",
+    "express": "~4.9.0",
+    "node-sass": "~0.9.3"
   }
 }

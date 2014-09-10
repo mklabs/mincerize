@@ -1,0 +1,48 @@
+#!/usr/bin/env node
+
+var fs         = require('fs');
+var path       = require('path')
+var shellwords = require('shellwords').split;
+var program    = require('commander')
+var exists     = fs.existsSync;
+
+process.env.DEBUG = typeof process.env.DEBUG != 'undefined' ? process.env.DEBUG : 'mincerize*';
+var debug   = require('debug')('mincerize');
+
+// Options
+
+function list(val) {
+  return val.split(',');
+}
+
+if (fs.existsSync('.mincerrc')) {
+  var rcflags = fs.readFileSync('.mincerrc', 'utf8').replace(/^#.*/gm, '');
+  [].splice.apply(process.argv, [2, 0].concat(shellwords(rcflags)));
+}
+
+program
+  .option('-M, --mount <mountpoint>', 'Specify the mount point for the Asset Pipeline(default: assets)')
+  .option('-p, --port <port>', 'Specify the port to listen on (default: 3000)')
+  .option('-I, --include <path>', 'Adds the directory to the Mincer load path. Comma separated list of values', list)
+  .parse(process.argv);
+
+// Defaults
+
+program.mount = program.mount || 'assets';
+program.includes = program.includes || [];
+
+// Require app
+
+var app = require('../server')(program);
+
+// And listen
+
+var port = program.port || process.env.PORT || 3000;
+app.listen(port, function (err) {
+  if (err) {
+    debug("Failed start server: " + (err.message || err.toString()));
+    process.exit(128);
+  }
+
+  debug('Listening on localhost:%s', port);
+});

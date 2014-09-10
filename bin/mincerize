@@ -1,0 +1,9 @@
+#!/usr/bin/env node
+
+var program = require('commander');
+
+program
+  .command('html', 'Parse and outputs the list of matching assets from an HTML file')
+  .command('build', 'Compiles and produces Mincer manifest from an HTML file')
+  .command('serve', 'Start an asset pipeline development server')
+  .parse(process.argv);

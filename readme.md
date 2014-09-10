@@ -2,14 +2,71 @@ mincerize
 =========
 
 A set of scripts working together with Mincer, providing an easy way to
-compile and replace JS or CSS files based on an HTML file (or template).
+compile and replace JS or CSS files based on an HTML file (or template)
+as well as a development server.
 
-### mincer-html
+### mincerize
+
+Top level command
+
+    Usage: mincerize [options] [command]
+
+    Commands:
+
+      html
+         Parse and outputs the list of matching assets from an HTML file
+
+      build
+         Compiles and produces Mincer manifest from an HTML file
+
+      serve
+         Start an asset pipeline development server
+
+      help [cmd]
+         display help for [cmd]
+
+
+    Options:
+
+      -h, --help  output usage information
+
+### mincerize-serve
+
+A development server based on Mincer with file watching utility and
+livereload.
+
+- Automatically watch any file within one of Mincer's include paths
+- Integration with Bower (bower_components added as an include paths)
+- Livereload event when a file changes
+- Development friendly error, based on and inspired by Play framework.
+
+---
+
+    Usage: mincerize-serve [options]
+
+    Options:
+
+      -h, --help                output usage information
+      -M, --mount <mountpoint>  Specify the mount point for the Asset Pipeline(default: assets)
+      -p, --port <port>         Specify the port to listen on (default: 3000)
+      -I, --include <path>      Adds the directory to the Mincer load path. Comma separated list of values
+
+**Examples**
+
+
+Clone the repo locally and cd into the examples folder.
+
+    $ git clone
+    $ npm install
+    $ cd examples/mincer && bower install
+    $ mincerize serve
+
+### mincerize-html
 
 This command takes an HTML file and returns a list of matching assets,
 JS or CSS file.
 
-    Usage: mincer-html [options]
+    Usage: mincerize-html [options]
 
     Options:
 
@@ -23,10 +80,10 @@ JS or CSS file.
 
 **Example**
 
-    $ mincer-html --filename ./examples/todo-backbone/index.html
+    $ mincerize html --filename ./examples/todo-backbone/index.html
 
 
-### mincer-build
+### mincerize-build
 
 This command takes an HTML file, and:
 
@@ -37,7 +94,7 @@ This command takes an HTML file, and:
 
 ---
 
-    Usage: mincer-build [options]
+    Usage: mincerize-build [options]
 
     Options:
 
@@ -51,9 +108,9 @@ This command takes an HTML file, and:
 
     Examples:
 
-      $ mincer-build -I ./bower_components -I ./app/assets/ -o build -f index.html
-      $ mincer-build --ignore googleapi -f index.html
+      $ mincerize build -I ./bower_components -I ./app/assets/ -o build -f index.html
+      $ mincerize build --ignore googleapi -f index.html
 
 **Example**
 
-    $ mincer-build -f examples/todo-backbone/index.html -I bower_components > new.html
+    $ mincerize build -f examples/todo-backbone/index.html -I bower_components > new.html

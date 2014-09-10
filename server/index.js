@@ -21,7 +21,6 @@ module.exports = function server (options) {
     .use('/' + options.mount, function(req, res, next) {
       return srv.handle(req, res, next);
     })
-    // .use('/' + options.mount, Mincer.createServer(environment))
     .use(express.static(path.resolve('./')))
     .use(tinylr.middleware({ app: app }))
 

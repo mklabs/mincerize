@@ -48,7 +48,7 @@ Server.prototype.check = function check(req, res, next, done) {
   var extname = path.extname(parsedUrl.pathname);
 
   // Bypass request to sourcemaps and/or images
-  if (extname !== '.js' || extname !== '.css') return done();
+  if (extname !== '.js' && extname !== '.css') return done();
 
   try {
     pathname = decodeURIComponent(pathname.replace(/^\//, ''));

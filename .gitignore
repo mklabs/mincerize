@@ -6,3 +6,4 @@ Gemfile.lock
 _*
 examples/site/
 build/
+bower_components

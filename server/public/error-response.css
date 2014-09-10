@@ -1,0 +1,45 @@
+
+body:before {
+  content: '{title}';
+  display: block;
+  font-family: Arial, sans-serif;
+
+  position: fixed;
+  top: 0;
+  right: 0;
+
+  font-size: 55px;
+  width: 100%;
+  padding: 0.5em 0;
+  text-align: center;
+
+
+  color: #fff;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, .3);
+
+  background: rgb(200, 16, 18);
+  background: rgba(200, 16, 18, 0.85);
+  font-weight: bolder;
+  border-bottom: 4px solid #BA7A7A;
+}
+
+body:after {
+  content: '{after}';
+  display: block;
+  position: relative;
+
+  position: fixed;
+  bottom: 0;
+  right: 0;
+
+  width: 100%;
+
+  text-align: center;
+  font-size: 14px;
+  padding: 1em 0;
+  color: #fff;
+  text-shadow: 1px 1px 1px rgba(0,0,0,.3);
+
+  background: #333;
+  border-top: 4px solid #2a2a2a;
+}

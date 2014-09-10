@@ -3,6 +3,7 @@
 var fs         = require('fs');
 var path       = require('path')
 var program    = require('commander')
+var shellwords = require('shellwords').split;
 var MincerHtml = require('../lib/mincer-html');
 var exists     = fs.existsSync;
 
@@ -10,6 +11,11 @@ var exists     = fs.existsSync;
 
 function list(val) {
   return val.split(',');
+}
+
+if (fs.existsSync('.mincerrc')) {
+  var rcflags = fs.readFileSync('.mincerrc', 'utf8').replace(/^#.*/gm, '');
+  [].splice.apply(process.argv, [2, 0].concat(shellwords(rcflags)));
 }
 
 program

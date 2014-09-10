@@ -1,0 +1,19 @@
+#!/usr/bin/env node
+
+var fs         = require('fs');
+var path       = require('path')
+var program    = require('commander')
+var exists     = fs.existsSync;
+
+function list(val) {
+  return val.split(',');
+}
+
+program
+  .option('-g, --grep <grep>', 'Only output assets matching the provided pattern', list)
+  .option('-i, --ignore <ignore>', 'Ignore assets matching the provided pattern', list)
+  .option('-f, --filename <filname>', 'Define the name of the input file')
+
+  .option('--css', 'Only output stylesheets')
+  .option('--js', 'Only output javascript')
+  .parse(process.argv);

@@ -3,6 +3,7 @@
 var fs          = require('fs');
 var path        = require('path')
 var exists      = fs.existsSync;
+var shellwords = require('shellwords').split;
 var program     = require('commander')
 var MincerBuild = require('../lib/mincer-build');
 
@@ -11,11 +12,16 @@ function list(val) {
   return val.split(',');
 }
 
+if (fs.existsSync('.mincerrc')) {
+  var rcflags = fs.readFileSync('.mincerrc', 'utf8').replace(/^#.*/gm, '');
+  [].splice.apply(process.argv, [2, 0].concat(shellwords(rcflags)));
+}
+
 program
   .option('-d, --debug', 'Turn on debugging info')
   .option('-I, --include <path>', 'Adds the directory to the Mincer load path. Comma separated list of values', list)
   .option('-i, --ignore <ignore>', 'Ignores the given string from assets to compile (relative to input file). Comma separated list of values', list)
-  .option('-o, --output', 'Copy provided assets into the provided directory')
+  .option('-o, --output <directory>', 'Build assets into the provided directory')
   .option('-f, --filename <filname>', 'Define the name of the input file')
 
   .on('--help', function() {

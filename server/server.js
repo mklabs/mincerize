@@ -230,9 +230,11 @@ Server.prototype.error = function _error(err, req, res, next) {
 
       // parse reason
       var reason = (err.toString().match(/<p class="detail">([^<]+)<\/p>/) || [])[1];
+      reason = reason || err.message.replace(/'/g, '"').replace(/\n/g, ' ');
+
       css = css
         .replace(/\{title\}/g, 'Compilation Error')
-        .replace('{after}', 'File:' + filename + '- Reason: ' + (reason || err.message.replace(/'/g, '"')));
+        .replace('{after}', 'File:' + filename + '- Reason: ' + reason);
       res.end(css);
     });
 

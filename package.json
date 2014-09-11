@@ -1,6 +1,6 @@
 {
   "name": "mincerize",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Set of scripts and development server based on Mincer",
   "directories": {
     "bin": "bin"
@@ -29,5 +29,7 @@
     "mocha": "~1.21.4",
     "rimraf": "~2.2.8"
   },
-  "keywords": ["mincer"]
+  "keywords": [
+    "mincer"
+  ]
 }

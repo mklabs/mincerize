@@ -28,5 +28,6 @@
   "devDependencies": {
     "mocha": "~1.21.4",
     "rimraf": "~2.2.8"
-  }
+  },
+  "keywords": ["mincer"]
 }

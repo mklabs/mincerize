@@ -6,7 +6,7 @@ var bin    = require.resolve('../bin/mincerize-html');
 
 describe('mincer-html', function() {
 
-  it('the binrary outputs the list of matching assets', function(done) {
+  it('the binary outputs the list of matching assets', function(done) {
     var args = ['--filename', 'examples/todo-backbone/index.html'];
     var p = spawn(bin, args);
 

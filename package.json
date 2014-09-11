@@ -1,8 +1,7 @@
 {
-  "name": "mincer-sourcemap",
+  "name": "mincerize",
   "version": "0.0.0",
-  "description": "Takes a mincer compiled script as input stream, outputs the minified bundle with sourcemap",
-  "main": "lib/mincer-sourcemap",
+  "description": "Set of scripts and development server based on Mincer",
   "directories": {
     "bin": "bin"
   },

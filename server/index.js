@@ -29,7 +29,6 @@ module.exports = function server (options) {
     return envPath + '/**/*';
   });
 
-
   debug('Monitoring changes for', watchedPaths);
   gaze(watchedPaths, function(err, watcher) {
     // On changed/added/deleted

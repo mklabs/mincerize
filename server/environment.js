@@ -45,7 +45,6 @@ module.exports = function _environment(options) {
   environment.appendPath('assets/stylesheets');
   environment.appendPath('assets/images');
   environment.appendPath('assets');
-  environment.appendPath('./');
   environment.appendPath('bower_components');
   environment.appendPath('vendor');
 

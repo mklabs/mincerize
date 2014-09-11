@@ -4,7 +4,7 @@ var path   = require('path');
 var rimraf = require('rimraf');
 var spawn  = require('child_process').spawn;
 var assert = require('assert');
-var bin    = require.resolve('../bin/mincer-build');
+var bin    = require.resolve('../bin/mincerize-build');
 
 describe('mincer-build', function() {
 

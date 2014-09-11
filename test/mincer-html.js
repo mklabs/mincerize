@@ -2,7 +2,7 @@
 var fs     = require('fs');
 var spawn  = require('child_process').spawn;
 var assert = require('assert');
-var bin    = require.resolve('../bin/mincer-html');
+var bin    = require.resolve('../bin/mincerize-html');
 
 describe('mincer-html', function() {
 

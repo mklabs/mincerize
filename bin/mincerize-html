@@ -13,14 +13,18 @@ function list(val) {
   return val.split(',');
 }
 
+function collect(val, memo) {
+  memo.push(val);
+  return memo;
+}
+
 if (fs.existsSync('.mincerrc')) {
   var rcflags = fs.readFileSync('.mincerrc', 'utf8').replace(/^#.*/gm, '');
   [].splice.apply(process.argv, [2, 0].concat(shellwords(rcflags)));
 }
 
 program
-  .option('-g, --grep <grep>', 'Only output assets matching the provided pattern', list)
-  .option('-i, --ignore <ignore>', 'Ignore assets matching the provided pattern', list)
+  .option('-i, --ignore <ignore>', 'Ignore assets matching the provided pattern', collect, [])
   .option('-f, --filename <filname>', 'Define the name of the input file')
 
   .option('--css', 'Only output stylesheets')

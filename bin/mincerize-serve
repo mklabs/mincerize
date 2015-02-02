@@ -11,8 +11,9 @@ var debug   = require('debug')('mincerize');
 
 // Options
 
-function list(val) {
-  return val.split(',');
+function collect(val, memo) {
+  memo.push(val);
+  return memo;
 }
 
 if (fs.existsSync('.mincerrc')) {
@@ -23,13 +24,14 @@ if (fs.existsSync('.mincerrc')) {
 program
   .option('-M, --mount <mountpoint>', 'Specify the mount point for the Asset Pipeline(default: assets)')
   .option('-p, --port <port>', 'Specify the port to listen on (default: 3000)')
-  .option('-I, --include <path>', 'Adds the directory to the Mincer load path. Comma separated list of values', list)
+  .option('-I, --include <path>', 'Adds the directory to the Mincer load path', collect, [])
+  .option('-i, --ignore <ignore>', 'Ignores the given string from assets to compile', collect, [])
+  .option('-w, --watch', 'Turn on watching of files in include paths to trigger a LiveReload event', collect, [])
   .parse(process.argv);
 
 // Defaults
 
 program.mount = program.mount || 'assets';
-program.includes = program.includes || [];
 
 // Require app
 

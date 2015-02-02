@@ -12,6 +12,11 @@ function list(val) {
   return val.split(',');
 }
 
+function collect(val, memo) {
+  memo.push(val);
+  return memo;
+}
+
 if (fs.existsSync('.mincerrc')) {
   var rcflags = fs.readFileSync('.mincerrc', 'utf8').replace(/^#.*/gm, '');
   [].splice.apply(process.argv, [2, 0].concat(shellwords(rcflags)));
@@ -19,10 +24,13 @@ if (fs.existsSync('.mincerrc')) {
 
 program
   .option('-d, --debug', 'Turn on debugging info')
-  .option('-I, --include <path>', 'Adds the directory to the Mincer load path. Comma separated list of values', list)
-  .option('-i, --ignore <ignore>', 'Ignores the given string from assets to compile (relative to input file). Comma separated list of values', list)
+  .option('-p, --prefix <prefix>', 'Extracts asset relative path based on this prefix')
+  .option('-I, --include <path>', 'Adds the directory to the Mincer load path. Comma separated list of values', collect, [])
+  .option('-i, --ignore <ignore>', 'Ignores the given string from assets to compile (relative to input file). Comma separated list of values', collect, [])
   .option('-o, --output <directory>', 'Build assets into the provided directory')
   .option('-f, --filename <filname>', 'Define the name of the input file')
+  .option('-c, --compress', 'Turn on compression for JS / CSS (using uglify / csswring)')
+  .option('-s, --sourcemap', 'Turn on sourcemap generation')
 
   .on('--help', function() {
     console.log();

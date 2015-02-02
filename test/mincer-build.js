@@ -13,7 +13,7 @@ describe('mincer-build', function() {
   });
 
   it('the binary compiles the list of matching assets', function(done) {
-    var args = ['--filename', 'examples/todo-backbone/index.html', '--output', 'test/build', '-I', './'];
+    var args = ['--filename', 'examples/todo-backbone/index.html', '--output', 'test/build', '-I', 'examples/todo-backbone'];
 
     var p = spawn(bin, args);
     p.stdout.pipe(process.stdout);
@@ -28,7 +28,7 @@ describe('mincer-build', function() {
       assert.equal(stdout, fs.readFileSync('test/fixtures/index.html', 'utf8') + '\n');
 
       var manifest = require('./build/manifest.json');
-      assert.deepEqual(manifest, require('./fixtures/manifest.json'));
+      assert.deepEqual(manifest.assets, require('./fixtures/manifest.json').assets);
 
       done();
     });
@@ -37,7 +37,7 @@ describe('mincer-build', function() {
   it('compiles the list of matching assets', function(done) {
     var MincerBuild = require('../lib/mincer-build');
     var build = new MincerBuild(fs.readFileSync('examples/todo-backbone/index.html', 'utf8'), {
-      includes: ['./', 'assets'],
+      includes: ['examples/todo-backbone', 'examples/todo-backbone/assets'],
       filename: 'examples/todo-backbone/index.html',
       output: 'test/build'
     });
@@ -46,7 +46,7 @@ describe('mincer-build', function() {
       assert.equal(build.body, fs.readFileSync('test/fixtures/index.html', 'utf8'));
 
       var manifest = require('./build/manifest.json');
-      assert.deepEqual(manifest, require('./fixtures/manifest.json'));
+      assert.deepEqual(manifest.assets, require('./fixtures/manifest.json').assets);
 
       done();
     });

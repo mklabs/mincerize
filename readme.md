@@ -42,6 +42,7 @@ livereload.
 
 ---
 
+
     Usage: mincerize-serve [options]
 
     Options:
@@ -49,7 +50,11 @@ livereload.
       -h, --help                output usage information
       -M, --mount <mountpoint>  Specify the mount point for the Asset Pipeline(default: assets)
       -p, --port <port>         Specify the port to listen on (default: 3000)
-      -I, --include <path>      Adds the directory to the Mincer load path. Comma separated list of values
+      -I, --include <path>      Adds the directory to the Mincer load path
+      -i, --ignore <ignore>     Ignores the given string from assets to compile
+      -w, --watch               Turn on watching of files in include paths to trigger a LiveReload event
+
+
 
 **Examples**
 
@@ -71,7 +76,6 @@ JS or CSS file.
     Options:
 
       -h, --help                output usage information
-      -g, --grep <grep>         Only output assets matching the provided pattern
       -i, --ignore <ignore>     Ignore assets matching the provided pattern
       -f, --filename <filname>  Define the name of the input file
       --css                     Only output stylesheets
@@ -96,20 +100,24 @@ This command takes an HTML file, and:
 
     Usage: mincerize-build [options]
 
-    Options:
+      Options:
 
-      -h, --help                output usage information
-      -d, --debug               Turn on debugging info
-      -I, --include <path>      Adds the directory to the Mincer load path. Comma separated list of values
-      -i, --ignore <ignore>     Ignores the given string from assets to compile (relative to input file). Comma separated list of values
-      -o, --output              Copy provided assets into the provided directory
-      -f, --filename <filname>  Define the name of the input file
+        -h, --help                output usage information
+        -d, --debug               Turn on debugging info
+        -p, --prefix <prefix>     Extracts asset relative path based on this prefix
+        -I, --include <path>      Adds the directory to the Mincer load path. Comma separated list of values
+        -i, --ignore <ignore>     Ignores the given string from assets to compile (relative to input file). Comma separated list of values
+        -o, --output <directory>  Build assets into the provided directory
+        -f, --filename <filname>  Define the name of the input file
+        -c, --compress            Turn on compression for JS / CSS (using uglify / csswring)
+        -s, --sourcemap           Turn on sourcemap generation
 
 
     Examples:
 
-      $ mincerize build -I ./bower_components -I ./app/assets/ -o build -f index.html
-      $ mincerize build --ignore googleapi -f index.html
+        $ mincer-build -I ./bower_components -I ./app/assets/ -o build -f index.html
+        $ mincer-build --ignore googleapi -f index.html
+
 
 **Example**
 

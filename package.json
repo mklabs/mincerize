@@ -1,6 +1,6 @@
 {
   "name": "mincerize",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Set of scripts and development server based on Mincer",
   "directories": {
     "bin": "bin"
